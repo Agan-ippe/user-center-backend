@@ -11,8 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * 用户服务功能实现类
@@ -45,8 +43,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
 
         //使用正则表达式校验用户账号
-        String regEx = "^(?=.*[a-zA-Z])(?=.*\\d)[a-zA-Z\\d]{6,18}$";
-        if (!userAccount.matches(regEx)) {
+        //至少包含一个字母和数字
+        String regExPassword = "^(?=.*[\\d])(?=.*[a-zA-Z])[a-zA-Z\\d!@#$%^&*_.]{8,20}$";
+        String regExAccount = "^[a-zA-Z\\d]{6,18}$";
+        if (!userAccount.matches(regExAccount)) {
+            return -1L;
+        }
+        if (!userPassword.matches(regExPassword)){
             return -1L;
         }
 
