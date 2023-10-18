@@ -3,6 +3,8 @@ package com.aip.usercenter.service;
 import com.aip.usercenter.bean.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * @author aip
  * @date 2023/10/14
@@ -23,4 +25,17 @@ public interface UserService extends IService<User> {
      */
     Long userRegister(String userAccount, String userPassword, String checkPassword);
 
+    /**
+     * 用于用户登录服务
+     * @author Aganippe
+     * @version v1.0
+     * @date 2023/10/16
+     * @name doLogin
+     * @param
+     * @param userAccount 用户账号
+     * @param userPassword 用户密码
+     * @param request r
+     * @return com.aip.usercenter.bean.User
+     */
+    User doLogin(String userAccount, String userPassword, HttpServletRequest request);
 }
