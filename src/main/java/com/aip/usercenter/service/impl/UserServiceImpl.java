@@ -1,5 +1,6 @@
 package com.aip.usercenter.service.impl;
 
+import com.aip.usercenter.contant.UserConstant;
 import com.aip.usercenter.dao.UserMapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -14,7 +15,6 @@ import org.springframework.util.DigestUtils;
 
 import javax.servlet.http.HttpServletRequest;
 
-
 /**
  * 用户服务功能实现类
  *
@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 @Service
 @Slf4j
 public class UserServiceImpl extends ServiceImpl<UserMapper, User>
-        implements UserService {
+        implements UserService, UserConstant {
 
     @Autowired
     UserMapper userMapper;
@@ -35,10 +35,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
      * 盐值
      */
     private static final String SALT = "Aip";
-    /**
-     * 用户登录状态键
-     */
-    private static final String USER_LOGIN_STATE = "userLoginState";
+
 
     @Override
     public Long userRegister(String userAccount, String userPassword, String checkPassword) {
@@ -46,10 +43,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             // TODO 修改为自定义异常
             return -1L;
         }
-        if (userAccount.length() < 6) {
+        if (userAccount.length() < ACCOUNT_MIN_LENGTH) {
             return -1L;
         }
-        if (userPassword.length() < 8 || checkPassword.length() < 8) {
+        if (userPassword.length() < PASSWORD_MIN_LENGTH || checkPassword.length() < PASSWORD_MIN_LENGTH) {
             return -1L;
         }
         if (!userPassword.equals(checkPassword)) {
@@ -59,7 +56,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         //使用正则表达式校验用户账号
         //至少包含一个字母和数字
         String regExPassword = "^(?=.*[\\d])(?=.*[a-zA-Z])[a-zA-Z\\d!@#$%^&*_.]{8,20}$";
-        String regExAccount = "^[a-zA-Z\\d]{6,18}$";
+        String regExAccount = "^[a-zA-Z\\d]{6,15}$";
         if (!userAccount.matches(regExAccount)) {
             return -1L;
         }
@@ -87,7 +84,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     }
 
     @Override
-    public User doLogin(String userAccount, String userPassword, HttpServletRequest request) {
+    public User userLogin(String userAccount, String userPassword, HttpServletRequest request) {
         if (StringUtils.isAnyBlank(userAccount, userPassword)) {
             return null;
         }
@@ -112,7 +109,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_account", userAccount);
-        queryWrapper.eq("userPassword", encryptPassword);
+        queryWrapper.eq("pwd", encryptPassword);
         User user = userMapper.selectOne(queryWrapper);
         //用户不存在
         if (user == null) {

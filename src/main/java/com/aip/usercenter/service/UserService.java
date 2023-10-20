@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
  * @date 2023/10/14
  */
 public interface UserService extends IService<User> {
-
     /**
      * 用户注册功能
      * @author Aganippe
@@ -37,5 +36,5 @@ public interface UserService extends IService<User> {
      * @param request r
      * @return com.aip.usercenter.bean.User
      */
-    User doLogin(String userAccount, String userPassword, HttpServletRequest request);
+    User userLogin(String userAccount, String userPassword, HttpServletRequest request);
 }
