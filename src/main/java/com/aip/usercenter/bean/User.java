@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
  * 用户表
  * @TableName t_user
  */
-@TableName(value ="t_user")
+@TableName(value = "t_user")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -41,7 +41,7 @@ public class User implements Serializable {
     private String pwd;
 
     /**
-     * 用户性别
+     * 用户性别 0-女  1-男
      */
     private Integer gender;
 
@@ -61,11 +61,6 @@ public class User implements Serializable {
     private Integer userStatus;
 
     /**
-     * 用户角色 0-普通用户  1-管理员
-     */
-    private Integer role;
-
-    /**
      * 创建时间
      */
     private Date createTime;
@@ -80,6 +75,11 @@ public class User implements Serializable {
      */
     @TableLogic
     private Integer deleted;
+
+    /**
+     * 用户角色 0-普通用户  1-管理员
+     */
+    private Integer userRole;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;

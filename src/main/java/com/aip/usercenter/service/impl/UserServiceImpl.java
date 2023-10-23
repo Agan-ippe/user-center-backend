@@ -116,19 +116,35 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             log.info("user login failed,user-account can't match user-password");
             return null;
         }
-        //脱敏
-        User encryptedUser = new User();
-        encryptedUser.setId(user.getId());
-        encryptedUser.setUsername(user.getUsername());
-        encryptedUser.setUserAccount(user.getUserAccount());
-        encryptedUser.setGender(user.getGender());
-        encryptedUser.setAvatarUrl(user.getAvatarUrl());
-        encryptedUser.setEmail(user.getEmail());
-        encryptedUser.setUserStatus(user.getUserStatus());
-        encryptedUser.setCreateTime(user.getCreateTime());
-
+        User encryptedUser = getEncryptedUser(user);
         //记录用户的登录状态
         request.getSession().setAttribute(USER_LOGIN_STATE,encryptedUser);
+        return encryptedUser;
+    }
+
+
+    /**
+     * 用户脱敏
+     * @author Aganippe
+     * @version v1.0
+     * @date 2023/10/23
+     * @name getEncryptedUser
+     * @param
+     * @param originUser 源用户
+     * @return com.aip.usercenter.bean.User
+     */
+    @Override
+    public User getEncryptedUser(User originUser){
+        User encryptedUser = new User();
+        encryptedUser.setId(originUser.getId());
+        encryptedUser.setUsername(originUser.getUsername());
+        encryptedUser.setUserAccount(originUser.getUserAccount());
+        encryptedUser.setGender(originUser.getGender());
+        encryptedUser.setAvatarUrl(originUser.getAvatarUrl());
+        encryptedUser.setEmail(originUser.getEmail());
+        encryptedUser.setUserRole(originUser.getUserRole());
+        encryptedUser.setUserStatus(originUser.getUserStatus());
+        encryptedUser.setCreateTime(originUser.getCreateTime());
         return encryptedUser;
     }
 }

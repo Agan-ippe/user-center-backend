@@ -37,4 +37,16 @@ public interface UserService extends IService<User> {
      * @return com.aip.usercenter.bean.User
      */
     User userLogin(String userAccount, String userPassword, HttpServletRequest request);
+
+    /**
+     * 用于用户脱敏
+     * @author Aganippe
+     * @version v1.0
+     * @date 2023/10/23
+     * @name getEncryptedUser
+     * @param
+     * @param originUser 源用户
+     * @return com.aip.usercenter.bean.User
+     */
+    User getEncryptedUser(User originUser);
 }

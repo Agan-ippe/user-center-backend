@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -64,29 +65,42 @@ public class UserController implements UserConstant {
     @GetMapping("/search")
     public List<User> queryUsers(String username, HttpServletRequest request) {
         //鉴权,仅管理员查询
-        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
-        User user = (User) userObj;
-        if (user == null || user.getRole() != ADMIN_ROLE){
+        if (!isAdmin(request)) {
             return new ArrayList<>();
         }
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         if (StringUtils.isBlank(username)) {
             queryWrapper.like("username", username);
         }
-        return userService.list(queryWrapper);
+        List<User> userList = userService.list(queryWrapper);
+        return userList.stream().map(user -> userService.getEncryptedUser(user)).collect(Collectors.toList());
     }
 
     @PostMapping("/delete")
     public boolean deleteUser(@RequestBody long id, HttpServletRequest request) {
-        //鉴权,仅管理员查询
-        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
-        User user = (User) userObj;
-        if (user == null || user.getRole() != ADMIN_ROLE){
+        if (!isAdmin(request)) {
             return false;
         }
         if (id <= 0) {
             return false;
         }
         return userService.removeById(id);
+    }
+
+    /**
+     * 鉴权,判断用户资质是否为管理员
+     * @author Aganippe
+     * @version v1.0
+     * @date 2023/10/22
+     * @name isAdmin
+     * @param
+     * @param request request
+     * @return boolean
+     */
+    public boolean isAdmin(HttpServletRequest request) {
+        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+        User user = (User) userObj;
+        return user != null && user.getUserRole() == ADMIN_ROLE;
+
     }
 }
