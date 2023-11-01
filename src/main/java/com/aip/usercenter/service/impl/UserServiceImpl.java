@@ -94,13 +94,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (userPassword.length() < 8) {
             return null;
         }
-        //使用正则表达式校验用户账号
-        //至少包含一个字母和数字
+        //使用正则表达式校验用户密码，至少包含一个字母和数字
         String regExPassword = "^(?=.*[\\d])(?=.*[a-zA-Z])[a-zA-Z\\d!@#$%^&*_.]{8,20}$";
-        String regExAccount = "^[a-zA-Z\\d]{6,18}$";
-        if (!userAccount.matches(regExAccount)) {
-            return null;
-        }
         if (!userPassword.matches(regExPassword)) {
             return null;
         }
