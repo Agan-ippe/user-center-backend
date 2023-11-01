@@ -30,23 +30,42 @@ public class UserController implements UserConstant {
     @Autowired
     private UserService userService;
 
-
     @PostMapping("/register")
     public Long userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
         if (userRegisterRequest == null) {
             return null;
         }
-
         String userAccount = userRegisterRequest.getUserAccount();
         String userPassword = userRegisterRequest.getUserPassword();
         String checkPassword = userRegisterRequest.getCheckPassword();
         if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
             return null;
         }
-
         return userService.userRegister(userAccount, userPassword, checkPassword);
     }
 
+    /**
+     * 获取当前的登录用户信息
+     * @author Aganippe
+     * @version v1.0
+     * @date 2023/11/1
+     * @name getCurrentUser
+     * @param
+     * @param request request
+     * @return com.aip.usercenter.bean.User
+     */
+    @GetMapping("/current")
+    public User getCurrentUser(HttpServletRequest request){
+        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+        User currentUser = (User) userObj;
+        if (currentUser == null) {
+            return null;
+        }
+        Long userId = currentUser.getId();
+        //todo 校验用户是否合法
+        User user = userService.getById(userId);
+        return userService.getEncryptedUser(user);
+    }
 
     @PostMapping("/login")
     public User userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {

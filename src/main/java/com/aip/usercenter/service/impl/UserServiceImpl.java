@@ -126,15 +126,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     /**
      * 用户脱敏
      * @author Aganippe
-     * @version v1.0
+     * @version v2.0
      * @date 2023/10/23
      * @name getEncryptedUser
      * @param
      * @param originUser 源用户
+     * @apiNote 更新了一个判空优化，防止当前端传回的用户信息查询为空时，脱敏操作报错。
      * @return com.aip.usercenter.bean.User
      */
     @Override
     public User getEncryptedUser(User originUser){
+        if (originUser == null) {
+            return null;
+        }
         User encryptedUser = new User();
         encryptedUser.setId(originUser.getId());
         encryptedUser.setUsername(originUser.getUsername());
