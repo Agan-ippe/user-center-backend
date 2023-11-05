@@ -82,17 +82,17 @@ public class UserController implements UserConstant {
     }
 
     @GetMapping("/search")
-    public List<User> queryUsers(String username, HttpServletRequest request) {
+    public List<User> searchUsers(String username, HttpServletRequest request) {
         //鉴权,仅管理员查询
         if (!isAdmin(request)) {
             return new ArrayList<>();
         }
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        if (StringUtils.isBlank(username)) {
+        if (StringUtils.isNotBlank(username)) {
             queryWrapper.like("username", username);
         }
         List<User> userList = userService.list(queryWrapper);
-        return userList.stream().map(user -> userService.getEncryptedUser(user)).collect(Collectors.toList());
+         return userList.stream().map(user -> userService.getEncryptedUser(user)).collect(Collectors.toList());
     }
 
     @PostMapping("/delete")
