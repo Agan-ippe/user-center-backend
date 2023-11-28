@@ -49,4 +49,14 @@ public interface UserService extends IService<User> {
      * @return com.aip.usercenter.bean.User
      */
     User getEncryptedUser(User originUser);
+
+    /**
+     * 退出登录
+     * @author Aganippe
+     * @version v1.0
+     * @date 2023/11/6
+     * @name userLogout
+     * @return int
+     */
+    Integer userLogout(HttpServletRequest request);
 }

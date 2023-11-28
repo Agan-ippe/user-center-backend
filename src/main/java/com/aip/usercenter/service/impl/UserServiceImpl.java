@@ -1,7 +1,9 @@
 package com.aip.usercenter.service.impl;
 
+import com.aip.usercenter.common.ErrorCode;
 import com.aip.usercenter.contant.UserConstant;
 import com.aip.usercenter.dao.UserMapper;
+import com.aip.usercenter.exception.BusinessException;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.aip.usercenter.bean.User;
@@ -41,16 +43,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     public Long userRegister(String userAccount, String userPassword, String checkPassword) {
         if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
             // TODO 修改为自定义异常
-            return -1L;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"账号或密码不能为空");
         }
         if (userAccount.length() < ACCOUNT_MIN_LENGTH) {
-            return -1L;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"账号长度违规");
         }
         if (userPassword.length() < PASSWORD_MIN_LENGTH || checkPassword.length() < PASSWORD_MIN_LENGTH) {
-            return -1L;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"密码长度违规");
         }
         if (!userPassword.equals(checkPassword)) {
-            return -1L;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"两次密码不一致");
         }
 
         //使用正则表达式校验用户账号
@@ -58,10 +60,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         String regExPassword = "^(?=.*[\\d])(?=.*[a-zA-Z])[a-zA-Z\\d!@#$%^&*_.]{8,20}$";
         String regExAccount = "^[a-zA-Z\\d]{6,15}$";
         if (!userAccount.matches(regExAccount)) {
-            return -1L;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"非法账号");
         }
         if (!userPassword.matches(regExPassword)) {
-            return -1L;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"非法密码");
         }
 
         //判断用户账号是否在数据库中重复
@@ -69,7 +71,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         queryWrapper.eq("user_account", userAccount);
         long count = userMapper.selectCount(queryWrapper);
         if (count > 0) {
-            return -1L;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"用户已存在");
         }
 
         //加密密码
@@ -86,18 +88,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     @Override
     public User userLogin(String userAccount, String userPassword, HttpServletRequest request) {
         if (StringUtils.isAnyBlank(userAccount, userPassword)) {
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"用户名或密码不能为空");
         }
         if (userAccount.length() < 6) {
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"用户名长度违规");
         }
         if (userPassword.length() < 8) {
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"密码长度违规");
         }
         //使用正则表达式校验用户密码，至少包含一个字母和数字
         String regExPassword = "^(?=.*[\\d])(?=.*[a-zA-Z])[a-zA-Z\\d!@#$%^&*_.]{8,20}$";
         if (!userPassword.matches(regExPassword)) {
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"非法密码");
         }
 
         //查询用户登录信息是否符合数据库信息
@@ -109,7 +111,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         //用户不存在
         if (user == null) {
             log.info("user login failed,user-account can't match user-password");
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"用户不存在，请先注册");
         }
         User encryptedUser = getEncryptedUser(user);
         //记录用户的登录状态
@@ -145,6 +147,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         encryptedUser.setUserStatus(originUser.getUserStatus());
         encryptedUser.setCreateTime(originUser.getCreateTime());
         return encryptedUser;
+    }
+
+    @Override
+    public Integer userLogout(HttpServletRequest request) {
+        request.getSession().removeAttribute(USER_LOGIN_STATE);
+        return 1;
     }
 }
 
