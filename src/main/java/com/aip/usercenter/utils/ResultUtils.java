@@ -1,6 +1,8 @@
-package com.aip.usercenter.common;
+package com.aip.usercenter.utils;
 
-import com.sun.istack.internal.NotNull;
+import com.aip.usercenter.common.BaseResponse;
+import com.aip.usercenter.common.ErrorCode;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Aip
@@ -10,13 +12,22 @@ import com.sun.istack.internal.NotNull;
  */
 public class ResultUtils {
 
+    private static final Object DATA_NULL = null;
+
+    /**
+     * 成功状态码
+     * @return com.aip.usercenter.common.BaseResponse<T>
+     * @author Aganippe
+     * @version v1.0
+     * @date 2024/1/4
+     * @name success
+     */
     public static <T> BaseResponse<T> success(T data) {
         return new BaseResponse<>(200, data, "success");
     }
 
     /**
      * 失败
-     *
      * @param errorCode 失败状态码
      * @return com.aip.usercenter.common.BaseResponse
      * @author Aganippe
@@ -28,15 +39,14 @@ public class ResultUtils {
     }
 
     public static BaseResponse error(int code, String message, String description) {
-        return new BaseResponse<>(code, message, description);
-    }
-
-    public static BaseResponse error(ErrorCode errorCode, String description) {
-        return new BaseResponse<>(errorCode.getCode(), description);
+        return new BaseResponse(code, DATA_NULL, message, description);
     }
 
     public static BaseResponse error(ErrorCode errorCode, String message, String description) {
-        return new BaseResponse<>(errorCode.getCode(), message, description);
+        return new BaseResponse(errorCode.getCode(), DATA_NULL, message, description);
     }
 
+    public static BaseResponse error(ErrorCode errorCode, String description) {
+        return new BaseResponse(errorCode.getCode(), DATA_NULL, errorCode.getMessage(), description);
+    }
 }

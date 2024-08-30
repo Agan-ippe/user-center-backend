@@ -42,17 +42,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     @Override
     public Long userRegister(String userAccount, String userPassword, String checkPassword) {
         if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
-            // TODO 修改为自定义异常
-            throw new BusinessException(ErrorCode.PARAMS_ERROR,"账号或密码不能为空");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号或密码不能为空");
         }
         if (userAccount.length() < ACCOUNT_MIN_LENGTH) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR,"账号长度违规");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号长度违规");
         }
         if (userPassword.length() < PASSWORD_MIN_LENGTH || checkPassword.length() < PASSWORD_MIN_LENGTH) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR,"密码长度违规");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "密码长度违规");
         }
         if (!userPassword.equals(checkPassword)) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR,"两次密码不一致");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "两次密码不一致");
         }
 
         //使用正则表达式校验用户账号
@@ -111,7 +110,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         //用户不存在
         if (user == null) {
             log.info("user login failed,user-account can't match user-password");
-            throw new BusinessException(ErrorCode.PARAMS_ERROR,"用户不存在，请先注册");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"账号或密码错误，请检查后重新输入");
         }
         User encryptedUser = getEncryptedUser(user);
         //记录用户的登录状态

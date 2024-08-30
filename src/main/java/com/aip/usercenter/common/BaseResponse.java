@@ -4,6 +4,7 @@ package com.aip.usercenter.common;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
 
@@ -27,27 +28,19 @@ public class BaseResponse<T> implements Serializable {
     public BaseResponse() {
     }
 
-    public BaseResponse(int code, T data) {
-        this.code = code;
-        this.data = data;
-    }
-
-    public BaseResponse(T data, String message) {
-        this.data = data;
-        this.message = message;
-    }
-
-    public BaseResponse(int code, T data, String message) {
-        this.code = code;
-        this.data = data;
-        this.message = message;
-    }
-
     public BaseResponse(int code, T data, String message, String description) {
         this.code = code;
         this.data = data;
         this.message = message;
         this.description = description;
+    }
+
+    public BaseResponse(int code, T data, String message) {
+        this(code, data, message, "");
+    }
+
+    public BaseResponse(int code, T data) {
+        this(code, data, "", "");
     }
 
     public BaseResponse(ErrorCode errorCode) {

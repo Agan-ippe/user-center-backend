@@ -14,7 +14,7 @@ public enum ErrorCode {
     /**
      * 成功
      */
-    SUCCESS(0,"success",""),
+    SUCCESS(20000,"success",""),
     /**
      * 请求参数错误
      */
@@ -22,7 +22,7 @@ public enum ErrorCode {
     /**
      * 请求错误
      */
-    NULL_ERROR(40001, "请求为空", ""),
+    NULL_ERROR(40001, "请求数据为空", ""),
     /**
      * 登录错误
      */
@@ -31,23 +31,25 @@ public enum ErrorCode {
      * 权限错误
      */
     NO_AUTH(40101, "无权限", ""),
-
+    /**
+     * 系统异常
+     */
     SYSTEM_ERROR(50000,"系统内部异常","");
 
     /**
      * 状态码
      */
-    private int code;
+    private final int code;
 
     /**
      * 状态码信息
      */
-    private String message;
+    private final String message;
 
     /**
      * 状态码详情描述
      */
-    private String description;
+    private final String description;
 
     ErrorCode(int code, String message, String description) {
         this.code = code;

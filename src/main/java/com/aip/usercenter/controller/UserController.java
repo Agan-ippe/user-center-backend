@@ -5,7 +5,7 @@ import com.aip.usercenter.bean.requset.UserLoginRequest;
 import com.aip.usercenter.bean.requset.UserRegisterRequest;
 import com.aip.usercenter.common.BaseResponse;
 import com.aip.usercenter.common.ErrorCode;
-import com.aip.usercenter.common.ResultUtils;
+import com.aip.usercenter.utils.ResultUtils;
 import com.aip.usercenter.contant.UserConstant;
 import com.aip.usercenter.exception.BusinessException;
 import com.aip.usercenter.service.UserService;
@@ -34,21 +34,6 @@ public class UserController implements UserConstant {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/register")
-    public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
-        if (userRegisterRequest == null) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR,"参数为空");
-        }
-        String userAccount = userRegisterRequest.getUserAccount();
-        String userPassword = userRegisterRequest.getUserPassword();
-        String checkPassword = userRegisterRequest.getCheckPassword();
-        if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
-            return ResultUtils.error(ErrorCode.PARAMS_ERROR);
-        }
-        Long result = userService.userRegister(userAccount, userPassword, checkPassword);
-        return ResultUtils.success(result);
-    }
-
     /**
      * 获取当前的登录用户信息
      * @author Aganippe
@@ -60,7 +45,7 @@ public class UserController implements UserConstant {
      * @return com.aip.usercenter.bean.User
      */
     @GetMapping("/current")
-    public User getCurrentUser(HttpServletRequest request){
+    public BaseResponse<User> getCurrentUser(HttpServletRequest request){
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
         User currentUser = (User) userObj;
         if (currentUser == null) {
@@ -69,8 +54,27 @@ public class UserController implements UserConstant {
         Long userId = currentUser.getId();
         //todo 校验用户是否合法
         User user = userService.getById(userId);
-        return userService.getEncryptedUser(user);
+        User encryptedUser = userService.getEncryptedUser(user);
+        return ResultUtils.success(encryptedUser);
     }
+
+
+    @PostMapping("/register")
+    public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
+        if (userRegisterRequest == null) {
+//            return ResultUtils.error(ErrorCode.PARAMS_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        String userAccount = userRegisterRequest.getUserAccount();
+        String userPassword = userRegisterRequest.getUserPassword();
+        String checkPassword = userRegisterRequest.getCheckPassword();
+        if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
+            return ResultUtils.error(ErrorCode.PARAMS_ERROR);
+        }
+        Long result = userService.userRegister(userAccount, userPassword, checkPassword);
+        return ResultUtils.success(result);
+    }
+
 
     @PostMapping("/login")
     public BaseResponse<User> userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
@@ -88,36 +92,39 @@ public class UserController implements UserConstant {
     }
 
     @PostMapping("/logout")
-    public Integer userLogout(HttpServletRequest request) {
+    public BaseResponse<Integer> userLogout(HttpServletRequest request) {
         if (request == null) {
             return null;
         }
-        return userService.userLogout(request);
+        Integer result = userService.userLogout(request);
+        return ResultUtils.success(result);
     }
 
     @GetMapping("/search")
-    public List<User> searchUsers(String username, HttpServletRequest request) {
+    public BaseResponse<List<User>> searchUsers(String username, HttpServletRequest request) {
         //鉴权,仅管理员查询
         if (!isAdmin(request)) {
-            return new ArrayList<>();
+           throw new BusinessException(ErrorCode.NO_AUTH, "非管理员禁止访问");
         }
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         if (StringUtils.isNotBlank(username)) {
             queryWrapper.like("username", username);
         }
         List<User> userList = userService.list(queryWrapper);
-         return userList.stream().map(user -> userService.getEncryptedUser(user)).collect(Collectors.toList());
+        List<User> list = userList.stream().map(user -> userService.getEncryptedUser(user)).collect(Collectors.toList());
+        return ResultUtils.success(list);
     }
 
     @PostMapping("/delete")
-    public boolean deleteUser(@RequestBody long id, HttpServletRequest request) {
+    public BaseResponse<Boolean> deleteUser(@RequestBody long id, HttpServletRequest request) {
         if (!isAdmin(request)) {
-            return false;
+            return null;
         }
         if (id <= 0) {
-            return false;
+            return null;
         }
-        return userService.removeById(id);
+        boolean result = userService.removeById(id);
+        return ResultUtils.success(result);
     }
 
     /**
