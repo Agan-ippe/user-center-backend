@@ -33,6 +33,7 @@ public class UserController implements UserConstant {
 
     @Autowired
     private UserService userService;
+    //推的上去吗
 
     /**
      * 获取当前的登录用户信息
