@@ -1,6 +1,5 @@
 package com.aip.usercenter.exception;
 
-import com.aip.usercenter.common.BaseResponse;
 import com.aip.usercenter.common.ErrorCode;
 import lombok.Data;
 

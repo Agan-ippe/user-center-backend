@@ -2,7 +2,6 @@ package com.aip.usercenter.utils;
 
 import com.aip.usercenter.common.BaseResponse;
 import com.aip.usercenter.common.ErrorCode;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Aip

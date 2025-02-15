@@ -1,6 +1,8 @@
 package com.aip.usercenter.service;
 
-import com.aip.usercenter.bean.User;
+import com.aip.usercenter.pojo.domain.User;
+import com.aip.usercenter.pojo.dto.UserLoginDTO;
+import com.aip.usercenter.pojo.dto.UserRegisterDTO;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,30 +15,22 @@ public interface UserService extends IService<User> {
     /**
      * 用户注册功能
      * @author Aganippe
-     * @version v1.0
      * @name userRegister 用户注册
-     * @param
-     * @param userAccount 用户账号
-     * @param userPassword 用户密码
-     * @param checkPassword 确认密码
-     * @notice
+     * @param registerDTO 用户注册信息
      * @return long 新用户ID
      */
-    Long userRegister(String userAccount, String userPassword, String checkPassword);
+    Long userRegister(UserRegisterDTO registerDTO);
 
     /**
      * 用于用户登录服务
      * @author Aganippe
-     * @version v1.0
      * @date 2023/10/16
      * @name doLogin
-     * @param
-     * @param userAccount 用户账号
-     * @param userPassword 用户密码
+     * @param userLoginDTO 用户登录信息
      * @param request r
      * @return com.aip.usercenter.bean.User
      */
-    User userLogin(String userAccount, String userPassword, HttpServletRequest request);
+    User userLogin(UserLoginDTO userLoginDTO, HttpServletRequest request);
 
     /**
      * 用于用户脱敏

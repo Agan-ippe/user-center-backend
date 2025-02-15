@@ -1,7 +1,6 @@
 package com.aip.usercenter.common;
 
 import lombok.Getter;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 /**
  * @author Aip
@@ -26,11 +25,15 @@ public enum ErrorCode {
     /**
      * 登录错误
      */
-    NOT_LOGIN(40100, "未登录", ""),
+    NOT_LOGIN(40002, "未登录", ""),
     /**
      * 权限错误
      */
     NO_AUTH(40101, "无权限", ""),
+    /**
+     * 非法请求
+     */
+    ILLEGAL_REQUEST(40300, "非法请求", ""),
     /**
      * 系统异常
      */

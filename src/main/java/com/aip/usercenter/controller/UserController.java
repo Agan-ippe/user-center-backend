@@ -1,8 +1,10 @@
 package com.aip.usercenter.controller;
 
-import com.aip.usercenter.bean.User;
-import com.aip.usercenter.bean.requset.UserLoginRequest;
-import com.aip.usercenter.bean.requset.UserRegisterRequest;
+import com.aip.usercenter.pojo.domain.User;
+import com.aip.usercenter.pojo.dto.UserLoginDTO;
+import com.aip.usercenter.pojo.dto.UserRegisterDTO;
+import com.aip.usercenter.requset.UserLoginRequest;
+import com.aip.usercenter.requset.UserRegisterRequest;
 import com.aip.usercenter.common.BaseResponse;
 import com.aip.usercenter.common.ErrorCode;
 import com.aip.usercenter.utils.ResultUtils;
@@ -16,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,12 +39,10 @@ public class UserController implements UserConstant {
     /**
      * 获取当前的登录用户信息
      * @author Aganippe
-     * @version v1.0
      * @date 2023/11/1
      * @name getCurrentUser
-     * @param
      * @param request request
-     * @return com.aip.usercenter.bean.User
+     * @return com.aip.usercenter.pojo.domain.User
      */
     @GetMapping("/current")
     public BaseResponse<User> getCurrentUser(HttpServletRequest request){
@@ -63,16 +62,15 @@ public class UserController implements UserConstant {
     @PostMapping("/register")
     public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
         if (userRegisterRequest == null) {
-//            return ResultUtils.error(ErrorCode.PARAMS_ERROR);
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         String userAccount = userRegisterRequest.getUserAccount();
         String userPassword = userRegisterRequest.getUserPassword();
         String checkPassword = userRegisterRequest.getCheckPassword();
         if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
-            return ResultUtils.error(ErrorCode.PARAMS_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        Long result = userService.userRegister(userAccount, userPassword, checkPassword);
+        Long result = userService.userRegister(new UserRegisterDTO(userAccount, userPassword, checkPassword));
         return ResultUtils.success(result);
     }
 
@@ -80,22 +78,23 @@ public class UserController implements UserConstant {
     @PostMapping("/login")
     public BaseResponse<User> userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
         if (userLoginRequest == null) {
-            return null;
+            throw new BusinessException(ErrorCode.ILLEGAL_REQUEST, "非法请求");
         }
         String userAccount = userLoginRequest.getUserAccount();
         String userPassword = userLoginRequest.getUserPassword();
 
         if (StringUtils.isAnyBlank(userAccount, userPassword)) {
-            return null;
+            throw new BusinessException(ErrorCode.NULL_ERROR, "用户账号或密码不能为空");
         }
-        User user = userService.userLogin(userAccount, userPassword, request);
+
+        User user = userService.userLogin(new UserLoginDTO(userAccount,userPassword), request);
         return ResultUtils.success(user);
     }
 
     @PostMapping("/logout")
     public BaseResponse<Integer> userLogout(HttpServletRequest request) {
         if (request == null) {
-            return null;
+            throw new BusinessException(ErrorCode.NOT_LOGIN, "未登录");
         }
         Integer result = userService.userLogout(request);
         return ResultUtils.success(result);
@@ -119,10 +118,10 @@ public class UserController implements UserConstant {
     @PostMapping("/delete")
     public BaseResponse<Boolean> deleteUser(@RequestBody long id, HttpServletRequest request) {
         if (!isAdmin(request)) {
-            return null;
+            throw new BusinessException(ErrorCode.NO_AUTH, "非管理员禁止访问");
         }
         if (id <= 0) {
-            return null;
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数错误");
         }
         boolean result = userService.removeById(id);
         return ResultUtils.success(result);

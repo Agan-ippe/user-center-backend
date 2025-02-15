@@ -14,6 +14,11 @@ public interface UserConstant {
     String USER_LOGIN_STATE = "userLoginState";
 
     /**
+     * 密码加盐
+     */
+    String SALT = "Aip";
+
+    /**
      * 默认权限
      */
     int DEFAULT_ROLE = 0;
@@ -26,7 +31,7 @@ public interface UserConstant {
     /**
      * 用户账号最小长度
      */
-    int ACCOUNT_MIN_LENGTH = 6;
+    int ACCOUNT_MIN_LENGTH = 5;
 
     /**
      * 用户账号最大长度
