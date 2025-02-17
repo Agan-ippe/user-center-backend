@@ -38,6 +38,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     @Override
     public Long userRegister(UserRegisterDTO registerDTO) {
+        log.info("registerDTO:{}", registerDTO);
         String userAccount = registerDTO.getUserAccount();
         String userPassword = registerDTO.getUserPassword();
         String checkPassword = registerDTO.getCheckPassword();
@@ -120,7 +121,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_account", userAccount);
-        queryWrapper.eq("pwd", encryptPassword);
+        queryWrapper.eq("user_password", encryptPassword);
         User user = userMapper.selectOne(queryWrapper);
         //用户不存在
         if (user == null) {
