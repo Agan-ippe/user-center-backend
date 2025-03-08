@@ -47,11 +47,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             log.info("user register failed,user-account or user-password is null");
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号或密码不能为空");
         }
-        if (userAccount.length() < ACCOUNT_MIN_LENGTH) {
+        if (userAccount.length() < ACCOUNT_MIN_LENGTH || userAccount.length() > ACCOUNT_MAX_LENGTH) {
             log.info("user register failed,user-account is illegal");
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号长度违规");
         }
-        if (userPassword.length() < PASSWORD_MIN_LENGTH || checkPassword.length() < PASSWORD_MIN_LENGTH) {
+        if (userPassword.length() < PASSWORD_MIN_LENGTH || userPassword.length() > PASSWORD_MAX_LENGTH) {
             log.info("user register failed,password length is illegal");
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "密码长度违规");
         }
@@ -96,18 +96,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     @Override
     public User userLogin(UserLoginDTO loginDTO, HttpServletRequest request) {
+        log.info("user login:{}", loginDTO);
         String userAccount = loginDTO.getUserAccount();
         String userPassword = loginDTO.getUserPassword();
         if (StringUtils.isAnyBlank(userAccount, userPassword)) {
             log.info("user login failed,user-account or user-password is null");
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"用户名或密码不能为空");
         }
-        if (userAccount.length() < ACCOUNT_MIN_LENGTH) {
-            log.info("user login failed,user-account length is less than 5");
+        if (userAccount.length() < ACCOUNT_MIN_LENGTH || userAccount.length() > ACCOUNT_MAX_LENGTH) {
+            log.info("user login failed,user-account length is less than 5 or more than 15");
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"用户名长度违规");
         }
-        if (userPassword.length() < 8) {
-            log.info("user login failed,user-password length is less than 8");
+        if (userPassword.length() < PASSWORD_MIN_LENGTH ||userPassword.length() > PASSWORD_MAX_LENGTH) {
+            log.info("user login failed,user-password length is less than 8 or more than 20");
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"密码长度违规");
         }
         //使用正则表达式校验用户密码，至少包含一个字母和数字
@@ -163,9 +164,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     }
 
     @Override
-    public Integer userLogout(HttpServletRequest request) {
+    public void userLogout(HttpServletRequest request) {
         request.getSession().removeAttribute(USER_LOGIN_STATE);
-        return 1;
     }
 }
 

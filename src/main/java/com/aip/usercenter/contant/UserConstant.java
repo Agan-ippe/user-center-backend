@@ -58,4 +58,8 @@ public interface UserConstant {
      */
     int PASSWORD_MAX_LENGTH = 20;
 
+    /**
+     * 用户退出登录
+     */
+    String USER_LOGOUT = "user logout";
 }

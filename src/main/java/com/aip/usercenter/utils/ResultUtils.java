@@ -26,6 +26,19 @@ public class ResultUtils {
     }
 
     /**
+     * 成功状态码
+     * @return com.aip.usercenter.common.BaseResponse<T>
+     * @author Aganippe
+     * @version v1.0
+     * @date 2024/1/4
+     * @name success
+     */
+    public static <T> BaseResponse<T> success() {
+        return new BaseResponse<>(200, "success");
+    }
+
+
+    /**
      * 失败
      * @param errorCode 失败状态码
      * @return com.aip.usercenter.common.BaseResponse

@@ -13,6 +13,8 @@ import com.aip.usercenter.exception.BusinessException;
 import com.aip.usercenter.service.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +34,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/user")
 public class UserController implements UserConstant {
 
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
     @Autowired
     private UserService userService;
     //推的上去吗
@@ -49,7 +52,7 @@ public class UserController implements UserConstant {
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
         User currentUser = (User) userObj;
         if (currentUser == null) {
-            return null;
+            throw new BusinessException(ErrorCode.NOT_LOGIN);
         }
         Long userId = currentUser.getId();
         //todo 校验用户是否合法
@@ -71,6 +74,7 @@ public class UserController implements UserConstant {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         Long result = userService.userRegister(new UserRegisterDTO(userAccount, userPassword, checkPassword));
+        log.info("id:{}",result);
         return ResultUtils.success(result);
     }
 
@@ -92,12 +96,12 @@ public class UserController implements UserConstant {
     }
 
     @PostMapping("/logout")
-    public BaseResponse<Integer> userLogout(HttpServletRequest request) {
+    public BaseResponse userLogout(HttpServletRequest request) {
         if (request == null) {
             throw new BusinessException(ErrorCode.NOT_LOGIN, "未登录");
         }
-        Integer result = userService.userLogout(request);
-        return ResultUtils.success(result);
+        userService.userLogout(request);
+        return ResultUtils.success(USER_LOGOUT);
     }
 
     @GetMapping("/search")
